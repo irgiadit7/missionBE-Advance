@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
+model Course {
   id Int @id @default(autoincrement())
   name String
   price Int

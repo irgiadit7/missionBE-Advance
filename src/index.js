@@ -1,4 +1,4 @@
-const express =require("express");
+const express = require("express");
 const dotenv = require("dotenv");
 const { PrismaClient } = require("./generated/prisma/client");
 
@@ -7,116 +7,143 @@ const app = express();
 
 dotenv.config();
 
-
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
 app.use(express.json());
 
 app.get("/api", (req, res) => {
     res.send("Hello World!");
-})
-
-app.get("/products", async (req, res)=> {
-    const products = await prisma.product.findMany();
-
-    res.send(products)
-})
-
-app.get("/products/:id", async (req, res)=>{
-    const productId = req.params.id;
-
-    const product = await prisma.product.findUnique({
-        where: {
-            id : parseInt(productId),
-        }
-    })
-
-    if (!product) {
-    return res.status(400).send("Product not found!")
-}
-
-res.send(product);
-
 });
 
-app.post("/products", async (req, res) => {
-    const newProductData = req.body;
+app.get("/course", async (req, res) => {
+    const courses = await prisma.course.findMany();
+    res.send(courses);
+});
 
-    const product = await prisma.product.create({
-            data : {
-                    name : newProductData.name,
-                    description : newProductData.description,
-                    image : newProductData.image,
-                    price : newProductData.price
-            }
-    });
+app.get("/course/:id", async (req, res) => {
+    try {
+        const courseId = parseInt(req.params.id);
 
-    res.send({
-        data : product,
-        massage : "create product succsess!"
-    })
-})
+        if (isNaN(courseId)) {
+            return res.status(400).send({
+                message: "Invalid ID format. ID must be a number."
+            });
+        }
 
-app.delete("/products/:id", async (req, res) => {
-    const productId = req.params.id //string
+        const course = await prisma.course.findUnique({
+            where: {
+                id: courseId,
+            },
+        });
 
-    await prisma.product.delete({
-        where : {
-            id: parseInt(productId),
+        if (!course) {
+            return res.status(404).send({
+                message: "Course not found!"
+            });
+        }
+        res.send(course);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: "Something went wrong on the server."
+        });
+    }
+});
+
+
+app.post("/course", async (req, res) => {
+    const newCourseData = req.body;
+    const course = await prisma.course.create({
+        data: {
+            name: newCourseData.name,
+            description: newCourseData.description,
+            image: newCourseData.image,
+            price: newCourseData.price,
         },
     });
 
-    res.send("Product Deleted!")
-})
+    res.status(201).send({
+        data: course,
+        message: "Create course success!",
+    });
+});
 
-app.put("/products/:id", async (req, res)=> {;
-    const productId = req.params.id;
-    const productData = req.body;
+app.delete("/course/:id", async (req, res) => {
+    try {
+        const courseId = parseInt(req.params.id);
 
-    if (!(productData.image && productData.description && productData.name && productData.price)) {
-       return res.status(400).send("Some file are missing!")
+        if (isNaN(courseId)) {
+            return res.status(400).send({ message: "Invalid ID format." });
+        }
+
+        await prisma.course.delete({
+            where: { id: courseId },
+        });
+
+        res.status(200).send({
+            message: "Course successfully deleted."
+        });
+
+    } catch (error) {
+        if (error.code === 'P2025') { 
+            return res.status(404).send({ message: "Course not found!" });
+        }
+        res.status(500).send({ message: "Something went wrong." });
+    }
+});
+
+
+app.put("/course/:id", async (req, res) => {
+    const courseId = req.params.id;
+    const courseData = req.body;
+
+    if (
+        !(
+            courseData.image &&
+            courseData.description &&
+            courseData.name &&
+            typeof courseData.price !== 'undefined'
+        )
+    ) {
+        return res.status(400).send({ message: "All fields are required for PUT request!" });
     }
 
-    const product = await prisma.product.update({
-            where : {
-                id: parseInt(productId),
-            },
-            data : {
-                description: productData.description,
-                image: productData.image,
-                name: productData.name,
-                price: productData.price
-            }
+    const course = await prisma.course.update({
+        where: {
+            id: parseInt(courseId),
+        },
+        data: {
+            description: courseData.description,
+            image: courseData.image,
+            name: courseData.name,
+            price: courseData.price,
+        },
     });
 
     res.send({
-        data: product,
-        massage: "Edit product succses!"
-    })
-})
+        data: course,
+        message: "Edit course success!",
+    });
+});
 
-app.patch("/products/:id", async (req, res)=>{ 
-       const productId = req.params.id;
-    const productData = req.body;
-
-    const product = await prisma.product.update({
-            where : {
-                id: parseInt(productId),
-            },
-            data : {
-                description: productData.description,
-                image: productData.image,
-                name: productData.name,
-                price: productData.price
-            }
+app.patch("/course/:id", async (req, res) => {
+    const courseId = req.params.id;
+    const courseData = req.body;
+    const course = await prisma.course.update({
+        where: {
+            id: parseInt(courseId),
+        },
+        data: courseData, 
     });
 
     res.send({
-        data: product,
-        massage: "Edit product succses!"
-    })
-})
+        data: course,
+        message: "Edit course success!",
+    });
+});
+
 
 app.listen(PORT, () => {
-    console.log("Express API running in port:" + PORT)
-})
+    console.log("Express API running in port: " + PORT);
+});

@@ -9,9 +9,12 @@ datasource db {
 }
 
 model Course {
-  id Int @id @default(autoincrement())
-  name String
-  price Int
+  id          Int     @id @default(autoincrement())
+  title       String 
   description String
-  image String
+  price       Int
+  author      String  
+  category    String 
+  imageUrl    String  
+  rating      Float  
 }

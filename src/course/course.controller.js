@@ -1,12 +1,10 @@
 const courseService = require("./course.service");
 
-// Controller untuk mendapatkan semua course
 const getAllCourses = async (req, res) => {
   const courses = await courseService.getAllCourses();
   res.send(courses);
 };
 
-// Controller untuk mendapatkan course berdasarkan ID
 const getCourseById = async (req, res) => {
   try {
     const courseId = parseInt(req.params.id);
@@ -17,7 +15,6 @@ const getCourseById = async (req, res) => {
   }
 };
 
-// Controller untuk membuat course baru
 const createCourse = async (req, res) => {
   try {
     const newCourseData = req.body;
@@ -31,7 +28,6 @@ const createCourse = async (req, res) => {
   }
 };
 
-// Controller untuk menghapus course
 const deleteCourseById = async (req, res) => {
   try {
     const courseId = parseInt(req.params.id);
@@ -42,13 +38,22 @@ const deleteCourseById = async (req, res) => {
   }
 };
 
-// Controller untuk mengedit course (PUT)
 const editCourseById = async (req, res) => {
   const courseId = parseInt(req.params.id);
   const courseData = req.body;
 
-  if (!courseData.name || !courseData.price || !courseData.description || !courseData.image) {
-     return res.status(400).send({ message: "Beberapa field wajib diisi" });
+  if (
+    !courseData.title ||
+    !courseData.description ||
+    !courseData.price ||
+    !courseData.author ||
+    !courseData.category ||
+    !courseData.imageUrl ||
+    !courseData.rating
+  ) {
+    return res
+      .status(400)
+      .send({ message: "Semua field wajib diisi untuk method PUT" });
   }
 
   try {
@@ -62,22 +67,21 @@ const editCourseById = async (req, res) => {
   }
 };
 
-// Controller untuk mengedit sebagian data course (PATCH)
 const patchCourseById = async (req, res) => {
-    try {
-        const courseId = parseInt(req.params.id);
-        const courseData = req.body;
-        
-        const course = await courseService.editCourseById(courseId, courseData);
-        
-        res.send({
-            data: course,
-            message: "Kursus berhasil diubah!",
-        });
-    } catch (error) {
-        res.status(400).send({ message: error.message });
-    }
-}
+  try {
+    const courseId = parseInt(req.params.id);
+    const courseData = req.body;
+
+    const course = await courseService.editCourseById(courseId, courseData);
+
+    res.send({
+      data: course,
+      message: "Kursus berhasil diubah!",
+    });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+};
 
 module.exports = {
   getAllCourses,

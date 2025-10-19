@@ -37,7 +37,18 @@ const loginUser = async (email, password) => {
     return token;
 }
 
+const verifyEmail = async (token)=>{
+    const user = await userRepository.findUserByVerificationToken(token);
+
+    if (!user) {
+    throw new Error("Invalid verification token");
+  }
+
+  await userRepository.updateUserVerification(user.id);
+}
+
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    verifyEmail
 }

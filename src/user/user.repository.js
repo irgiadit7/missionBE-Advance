@@ -30,9 +30,29 @@ const findUserByVerificationToken = async (token) => {
             verificationToken : token,
         }
     })
+
+    return user;
 }
+
+const updateUserVerification = async(userID)=>{
+    const user = await prisma.user.update({
+        where: {
+            id : userID,
+        },
+
+        data : {
+            isVerified : true,
+            verificationToken : null,
+        }
+    })
+
+    return user
+}
+
 
 module.exports = {
     insertUser,
-    findUserByEmail
+    findUserByEmail,
+    findUserByVerificationToken,
+    updateUserVerification
 }

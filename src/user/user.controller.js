@@ -55,7 +55,24 @@ const loginUser = async (req, res)=>{
     }
 }
 
+const verifyEmail = async (req, res)=>{
+  try {
+    const {token} = req.query;
+
+    if(!token){
+      return res.status(400).send({ message: "Token is required" });
+    }
+
+    await userService.verifyEmail(token);
+
+    res.status(200).send({ message: "Email verified successfully" });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+}
+
 module.exports = {
     registerUSer,
-    loginUser
+    loginUser,
+    verifyEmail
 }

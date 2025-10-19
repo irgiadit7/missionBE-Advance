@@ -27,4 +27,6 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  verificationToken String?  @unique
+  isVerified        Boolean  @default(false)
 }

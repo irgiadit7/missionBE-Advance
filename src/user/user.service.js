@@ -1,14 +1,20 @@
 const bcrypt = require("bcrypt");
 const userRepository = require("./user.repository");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { v4: uuidv4 } = require("uuid");
+const {sendVerificationEmail} = require("../utils/email");
 
 const createUser = async (newUserData) =>{
     const hashedPassword = await bcrypt.hash(newUserData.password, 10);
+    const verificationToken = uuidv4();
 
     const user = await userRepository.insertUser({
         ...newUserData,
         password: hashedPassword,
+        verificationToken,
     });
+
+    await sendVerificationEmail(user, verificationToken);
 
     return user;
 }

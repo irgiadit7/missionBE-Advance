@@ -28,7 +28,10 @@ const registerUSer = async (req, res)=> {
 
         
     } catch (error) {
-        res.status(500).send({ message: error.message });
+       if (error.code === 'P2002') {
+        return res.status(409).send({ message: "Username atau email sudah digunakan." });
+    }
+    res.status(500).send({ message: error.message });
     }
 }
 

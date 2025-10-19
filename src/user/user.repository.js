@@ -7,6 +7,7 @@ const insertUser = async (userData) => {
             username : userData.username,
             password : userData.password,
             email : userData.email,
+            verificationToken: userData.verificationToken,
         },
     });
 
@@ -21,6 +22,14 @@ const findUserByEmail = async (email) => {
     })
 
     return user
+}
+
+const findUserByVerificationToken = async (token) => {
+    const user = await prisma.user.findFirst ({
+        where: {
+            verificationToken : token,
+        }
+    })
 }
 
 module.exports = {

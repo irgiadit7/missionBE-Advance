@@ -1,0 +1,58 @@
+const userService = require("./user.service");
+
+const registerUSer = async (req, res)=> {
+    try {
+        const newUserData = req.body;
+
+        if (
+      !newUserData.fullname ||
+      !newUserData.username ||
+      !newUserData.password ||
+      !newUserData.email
+    ) {
+
+      return res.status(400).send({ message: "Semua field wajib diisi" });
+    }
+
+    const user = await userService.createUser(newUserData);
+
+    res.status(201).send({
+      data: {
+        id: user.id,
+        fullname: user.fullname,
+        username: user.username,
+        email: user.email,
+      },
+      message: "User berhasil diregistrasi!",
+    });
+
+        
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+}
+
+const loginUser = async (req, res)=>{
+    try {
+        const {email, password} = req.body
+
+        if(!email || !password) {
+            return res.status(400).send({message: "Email dan password wajib di isi!"})
+        };
+
+        const token = await userService.loginUser(email, password);
+
+        res.status(200).send({
+            token,
+            message: "Login berhasil!"
+        })
+        
+    } catch (error) {
+        res.status(400).send({message: error.message})
+    }
+}
+
+module.exports = {
+    registerUSer,
+    loginUser
+}

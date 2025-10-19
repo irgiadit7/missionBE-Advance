@@ -1,7 +1,8 @@
 const courseService = require("./course.service");
 
 const getAllCourses = async (req, res) => {
-  const courses = await courseService.getAllCourses();
+  const params = req.query; 
+  const courses = await courseService.getAllCourses(params);
   res.send(courses);
 };
 

@@ -1,9 +1,35 @@
 const prisma = require("./db");
 
-const findCourses = async () => {
-  const courses = await prisma.course.findMany();
-  return courses;
+const findCourses = async (params) => {
+  const { category, sortBy, search } = params;
+  let where = {};
+  let orderBy = {};
+
+  if (category){
+    where.category = category;
+  }
+
+  if (search){
+    where.title = {
+      contains : search,
+      mode : "insensitive"
+    }
+    };
+
+    if(sortBy === "price_asc") {
+      orderBy.price = "asc";
+    }else if (sortBy === "price_desc") {
+      orderBy.price = "desc";
+    }
+
+    const courses = await prisma.course.findMany({
+      where,
+      orderBy
+    });
+
+    return courses;
 };
+
 
 const findCourseById = async (id) => {
   const course = await prisma.course.findUnique({
